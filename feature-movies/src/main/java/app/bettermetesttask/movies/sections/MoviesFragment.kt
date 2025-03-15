@@ -1,12 +1,14 @@
 package app.bettermetesttask.movies.sections
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import app.bettermetesttask.featurecommon.injection.utils.Injectable
 import app.bettermetesttask.featurecommon.injection.viewmodel.SimpleViewModelProviderFactory
 import app.bettermetesttask.featurecommon.utils.views.gone
@@ -39,6 +41,9 @@ class MoviesFragment : Fragment(R.layout.movies_fragment), Injectable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.rvList.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvList.adapter = adapter
+
         adapter.onItemClicked = { movie ->
             viewModel.openMovieDetails(movie)
         }
@@ -46,6 +51,16 @@ class MoviesFragment : Fragment(R.layout.movies_fragment), Injectable {
         adapter.onItemLiked = { movie ->
             viewModel.likeMovie(movie)
         }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.openMovieDetailsFlow.collect { movie ->
+                val fragment = MovieDetailsBottomSheetFragment.newInstance(movie) { likedMovie ->
+                    viewModel.likeMovie(likedMovie)
+                }
+                fragment.show(childFragmentManager, "MovieDetailsBottomSheet")
+            }
+        }
+
     }
 
     override fun onResume() {
@@ -73,9 +88,9 @@ class MoviesFragment : Fragment(R.layout.movies_fragment), Injectable {
                 is MoviesState.Loaded -> {
                     progressBar.gone()
                     rvList.visible()
+                    adapter.submitList(state.movies)
                 }
                 else -> {
-                    // no op
                     progressBar.gone()
                     rvList.gone()
                 }

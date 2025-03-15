@@ -45,6 +45,7 @@ class MoviesAdapter @Inject constructor() : ListAdapter<Movie, MoviesAdapter.Mov
                 )
                 btnLike.setOnClickListener {
                     onItemLiked?.invoke(item)
+                    notifyItemChanged(adapterPosition)
                 }
                 rootLayout.setOnClickListener {
                     onItemClicked?.invoke(item)
