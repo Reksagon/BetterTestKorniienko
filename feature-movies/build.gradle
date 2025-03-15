@@ -30,6 +30,7 @@ dependencies {
     implementation androidXDependencies.lifecycle
 
     implementation uiDependencies.glide
+    implementation 'com.google.android.material:material:1.4.0'
     kapt uiDependencies.glideCompiler
 
     implementation diDependencies.dagger

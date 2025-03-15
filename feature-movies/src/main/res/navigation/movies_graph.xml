@@ -12,4 +12,5 @@
 
         <deepLink app:uri="@string/movies_deep_link" />
     </fragment>
+
 </navigation>

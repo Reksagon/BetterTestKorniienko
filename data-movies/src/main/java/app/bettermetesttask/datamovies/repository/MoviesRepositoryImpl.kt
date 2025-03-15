@@ -17,12 +17,33 @@ class MoviesRepositoryImpl @Inject constructor(
     private val restStore = MoviesRestStore()
 
     override suspend fun getMovies(): Result<List<Movie>> {
-        TODO("Not yet implemented")
+        return runCatching {
+            val movies = restStore.getMovies()
+            localStore.saveMovies(movies.map { mapper.mapToLocal(it) }) // Збереження в БД
+            Result.Success(movies)
+        }.getOrElse { error ->
+            val cachedMovies = localStore.getMovies().map { mapper.mapFromLocal(it) }
+            if (cachedMovies.isNotEmpty()) {
+                Result.Success(cachedMovies) // Якщо API не працює, повертаємо кеш
+            } else {
+                Result.Error(error) // Якщо кешу нема - повертаємо помилку
+            }
+        }
     }
 
+
+
+
     override suspend fun getMovie(id: Int): Result<Movie> {
-        return Result.of { mapper.mapFromLocal(localStore.getMovie(id)) }
+        return try {
+            val movieEntity = localStore.getMovie(id) ?: throw Exception("Movie not found")
+            Result.Success(mapper.mapFromLocal(movieEntity))
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
     }
+
+
 
     override fun observeLikedMovieIds(): Flow<List<Int>> {
         return localStore.observeLikedMoviesIds()

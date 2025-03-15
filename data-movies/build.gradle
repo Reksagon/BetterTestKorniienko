@@ -3,6 +3,8 @@ apply from: '../sharedconfigs-include.gradle'
 
 android {
     namespace 'app.bettermetesttask.datamovies'
+
+
 }
 
 dependencies {

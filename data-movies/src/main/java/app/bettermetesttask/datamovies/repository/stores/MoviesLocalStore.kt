@@ -20,8 +20,8 @@ class MoviesLocalStore @Inject constructor(
         return moviesDao.selectMovies()
     }
 
-    suspend fun getMovie(id: Int): MovieEntity {
-        return moviesDao.selectMovieById(id).first()
+    suspend fun getMovie(id: Int): MovieEntity? {
+        return moviesDao.selectMovieById(id).firstOrNull()
     }
 
     suspend fun likeMovie(id: Int) {
@@ -35,4 +35,10 @@ class MoviesLocalStore @Inject constructor(
     fun observeLikedMoviesIds(): Flow<List<Int>> {
         return moviesDao.selectLikedEntries().map { movieIdsFlow -> movieIdsFlow.map { it.movieId } }
     }
+
+    suspend fun saveMovies(movies: List<MovieEntity>) {
+        moviesDao.deleteMovies() // Очищаємо попередній список
+        moviesDao.insertMovies(movies) // Вставляємо нові дані
+    }
+
 }

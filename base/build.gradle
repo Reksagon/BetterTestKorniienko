@@ -26,10 +26,14 @@ android {
         }
     }
 
+
     kapt {
         // Avoid kapt mechanism that replaces every unknown type with NonExistentClass (for better dagger errors)
         correctErrorTypes = true
     }
+
+
+
 }
 
 dependencies {
@@ -52,6 +56,7 @@ dependencies {
     implementation androidXDependencies.navigationFragment
     implementation androidXDependencies.navigationUi
     implementation androidXDependencies.androidKtx
+    implementation uiDependencies.glide
 
     implementation diDependencies.dagger
     kapt diDependencies.daggerCompiler
@@ -63,4 +68,5 @@ dependencies {
 
     implementation dataDependencies.room
     kapt dataDependencies.roomCompiler
+
 }
